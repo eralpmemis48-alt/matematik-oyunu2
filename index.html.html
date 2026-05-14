@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>7. Sınıf Matematik Yarışı</title>
+    <style>
+        body { text-align: center; background: #333; color: white; font-family: sans-serif; overflow: hidden; }
+        #gameCanvas { background: #555; border: 4px solid #fff; display: block; margin: 20px auto; }
+        .info { font-size: 20px; }
+    </style>
+</head>
+<body>
+    <h1>7. Sınıf Matematik Arabası</h1>
+    <p class="info">Sağ-Sol Ok Tuşları ile Hareket Et! Soruları Çöz!</p>
+    <div class="info">Puan: <span id="score">0</span></div>
+    <canvas id="gameCanvas" width="400" height="500"></canvas>
+
+    <script>
+        const canvas = document.getElementById("gameCanvas");
+        const ctx = canvas.getContext("2d");
+
+        let score = 0;
+        let carX = 175;
+        let questionY = -50;
+        let questionX = Math.random() * 300 + 20;
+        let currentQuestion = { q: "(-5) + 8", a: "3" };
+
+        // 7. Sınıf Soru Havuzu
+        const questions = [
+            { q: "(-10) + 4", a: "-6" },
+            { q: "2x + 5 = 15 ise x?", a: "5" },
+            { q: "80'in %20'si?", a: "16" },
+            { q: "-12 / 3", a: "-4" },
+            { q: "3/4 ondalık?", a: "0.75" }
+        ];
+
+        function drawCar() {
+            ctx.fillStyle = "red";
+            ctx.fillRect(carX, 420, 50, 70); // Araba
+            ctx.fillStyle = "black";
+            ctx.fillRect(carX+5, 430, 10, 15); // Camlar
+            ctx.fillRect(carX+35, 430, 10, 15);
+        }
+
+        function drawQuestion() {
+            ctx.fillStyle = "yellow";
+            ctx.beginPath();
+            ctx.arc(questionX, questionY, 30, 0, Math.PI * 2);
+            ctx.fill();
+            ctx.fillStyle = "black";
+            ctx.fillText(currentQuestion.q, questionX - 20, questionY + 5);
+        }
+
+        function update() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            drawCar();
+            drawQuestion();
+
+            questionY += 1.5; // Sorunun aşağı düşme hızı
+
+            // Çarpışma kontrolü
+            if (questionY > 400 && questionX > carX && questionX < carX + 50) {
+                let answer = prompt(currentQuestion.q + " işleminin sonucu nedir?");
+                if (answer === currentQuestion.a) {
+                    alert("Doğru! +10 Puan");
+                    score += 10;
+                } else {
+                    alert("Yanlış! Doğru cevap: " + currentQuestion.a);
+                    score -= 5;
+                }
+                document.getElementById("score").innerText = score;
+                resetQuestion();
+            }
+
+            // Soru kaçarsa sıfırla
+            if (questionY > 500) { resetQuestion(); }
+
+            requestAnimationFrame(update);
+        }
+
+        function resetQuestion() {
+            questionY = -50;
+            questionX = Math.random() * 300 + 20;
+            currentQuestion = questions[Math.floor(Math.random() * questions.length)];
+        }
+
+        window.addEventListener("keydown", (e) => {
+            if (e.key === "ArrowLeft" && carX > 0) carX -= 20;
+            if (e.key === "ArrowRight" && carX < 350) carX += 20;
+        });
+
+        update();
+    </script>
+</body>
+</html>
